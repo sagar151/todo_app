@@ -100,12 +100,12 @@ const App = (props) => {
             style={[styles.input,isDarkMode?{backgroundColor:'#2f332f',color:'#FFF'}:{backgroundColor:'#FFF',color:'#404240'}]}
             onChangeText={task => setTask(task)}
             value={task}
-            placeholderTextColor={'#5e615e'}
+            placeholderTextColor={isDarkMode?'#939693':'#5e615e'}
             placeholder={'Enter your task'}
           />
           <TouchableOpacity onPress={() => handleAddTask()}>
             <View style={styles.addWrapper}>
-              <Text style={styles.addText}>+</Text>
+              <Text style={styles.addText}>{'+'}</Text>
             </View>
           </TouchableOpacity>
         </KeyboardAvoidingView>
