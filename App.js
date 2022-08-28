@@ -6,8 +6,7 @@
  * @flow strict-local
  */
 
-import React, {useState} from 'react';
-// import type {Node} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   SafeAreaView,
   StatusBar,
@@ -39,53 +38,33 @@ const App = (props) => {
 
   const isDarkMode = useColorScheme() === 'dark';
   const handleAddTask = () => {
-    // console.log("is task exist",taskItem.find(task))
      if(task)
      {
       Keyboard.dismiss() 
       props.AddTask(task)
       setTask("")
-      // Keyboard.removeAllListeners()
-     
      }
-     
-   
-    // setTaskItem([...taskItem, task]);
-    // setTask(null);
   };
 
-  // const completeTask = index => {
-    // let itemsCopy = [...taskItem];
-    // itemsCopy.splice(index, 1);
-    // setTaskItem(itemsCopy);
-    
-  // };
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
 
   useState(()=>{
     props.completedTask();
-    return ()=>{
-      if(task)
-      {
-        console.log("component will unmount");
-      }
-
-     
-    }
   },[DeleteTask])
 
   useState(()=>{
     props.completedTask();
-    return ()=>{
-      console.log("component will unmount");
-    }
   },[])
   return (
-
     <SafeAreaView style={styles.SafeAreaView}>
-      <View style={styles.container}>
+      <StatusBar
+          animated={true}
+          backgroundColor={isDarkMode?'#454a45':'#bdbfbd'}
+          barStyle={!isDarkMode?'dark-content': 'light-content'}
+      />
+      <View style={[styles.container,isDarkMode?{backgroundColor:'#212421'}:{backgroundColor: '#ebf0eb'}]}>
         <ScrollView
         contentContainerStyle={{
           flexGrow: 1
@@ -93,11 +72,11 @@ const App = (props) => {
         keyboardShouldPersistTaps='handled'
         >
           <View style={styles.taskWrapper}>
-            <Text style={styles.sectionTitle}>ToDo App 📝</Text>
+            <Text style={[styles.sectionTitle,isDarkMode?{color:'#FFF'}:{color: 'black'}]}>ToDo App 📝</Text>
           </View>
           <View style={styles.item}>
-            { !props.taskList? (
-              <View style={styles.item}>
+            { props.taskList===[]? (
+              <View style={{justifyContent:'center',alignItems:'center',backgroundColor:"blue"}}>
               <Text style={{paddingHorizontal:20,fontSize:20}}>no task found..</Text>
             </View>
               
@@ -106,7 +85,7 @@ const App = (props) => {
                 return (
                   <TouchableOpacity
                     key={index}
-                    onPress={() => props.DeleteTask(item)}>
+                    onLongPress={() => props.DeleteTask(item)}>
                     <Tasks text={item} />
                   </TouchableOpacity>
                 );
@@ -118,9 +97,10 @@ const App = (props) => {
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={styles.writeTaskWrapper}>
           <TextInput
-            style={styles.input}
+            style={[styles.input,isDarkMode?{backgroundColor:'#2f332f',color:'#FFF'}:{backgroundColor:'#FFF',color:'#404240'}]}
             onChangeText={task => setTask(task)}
             value={task}
+            placeholderTextColor={'#5e615e'}
             placeholder={'Enter your task'}
           />
           <TouchableOpacity onPress={() => handleAddTask()}>
@@ -140,7 +120,6 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: '#E8EAD',
   },
   taskWrapper: {
     paddingTop: 50,
@@ -156,7 +135,6 @@ const styles = StyleSheet.create({
     color:"#021129"
   },
   writeTaskWrapper: {
-    // position:"absolute",
     marginBottom:20,
     button: 60,
     width: '100%',
@@ -167,12 +145,11 @@ const styles = StyleSheet.create({
   input: {
     paddingVertical: 15,
     paddingHorizontal: 15,
-    backgroundColor: '#FFF',
     borderRadius: 60,
     borderColor: '#C0C0C0',
     borderWidth: 1,
     width: 250,
-    marginHorizontal:20
+    marginHorizontal:20,
   },
   addText:{
     fontSize:30,
@@ -192,10 +169,10 @@ const styles = StyleSheet.create({
   },
 });
 const mapStateToProps=(state)=>{
+  console.log(JSON.stringify(state.task.task))
   return{
-    taskList:state.task.task
+    taskList:state.task.task || []
   }
-  console.log("map state ",taskList)
 }
 
 export default connect(mapStateToProps,{AddTask,completedTask,DeleteTask})(App);
